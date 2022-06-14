@@ -1,7 +1,7 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, onUnmounted, onBeforeUnmount, onMounted } from 'vue';
 const items = ref(
-    []
+    JSON.parse(localStorage.getItem("todo.items")) || []
 );
 const addItem = () => {
     items.value.push(
@@ -17,6 +17,11 @@ const removeItem = (id) => {
         item => item.id !== id
     )
 }
+
+window.addEventListener("unload", () => {
+    localStorage.setItem("todo.items", JSON.stringify(items.value));
+    console.log("Saved!");
+});
 </script>
 
 <template>
@@ -25,19 +30,20 @@ const removeItem = (id) => {
             <ul class="list">
                 <li 
                 class="list-item"
-                :class="{completed: item.isDone}"
                 v-for="item in items"
                 :key="item.id">
-                    <div class="list-item">
-                    <input type="checkbox" v-model="item.isDone">
-                    <input class="list-item" type="text" v-model="item.body">
-                    <button class="list-remove" @click="removeItem(item.id)">X</button>
+                    <div class="list-item-div">
+                    <input class="list-item-checkbox" type="checkbox" v-model="item.isDone">
+                    <input class="list-item-input"
+                    :class="{completed: item.isDone}" type="text" v-model="item.body">
+                    <button class="list-item-removebtn" @click="removeItem(item.id)">X</button>
                     </div>
                 </li>
                 <li
-                class="list-item"
+                class="list-item-add"
                 >
                     <button
+                    class="list-item-addbtn"
                     @click="addItem()"
                     >
                         Add...
@@ -68,8 +74,53 @@ const removeItem = (id) => {
         width: 100%;
     }
     .list-item {
-        font-size: 25px;
-        display: flex;
-        width: 100%;
+        width: auto;
+        margin-left: 20px;
+        margin-right: 20px;
+        margin-bottom: 20px;
     }
+    .list-item-div {
+        display: flex;
+    }
+    .list-item-checkbox {
+        margin-right: 10px;
+    }
+    :checked {
+        background-color:antiquewhite;
+    }
+    .list-item-input {
+        width: calc(100% - 20px);
+        font-size: 20px;
+        background-color: unset;
+        border-width: 0;
+        border-bottom-width: 0.5px;
+        color: #ffffff;
+    }
+    
+    .completed {
+        color: #23d023;
+        text-decoration-line: line-through;
+    }
+    .list-item-removebtn {
+        margin-left: 10px;
+        background-color: #222222;
+        border-width: 0;
+        color: red;
+        padding: 5px;
+        border-radius: 5px;
+
+    }
+    .list-item-add {
+        margin-left: 50px;
+        margin-bottom: 20px;
+    }
+    .list-item-addbtn {
+        font-size: 20px;
+        background-color: #222222;
+        border-width: 0;
+        color: #ffffff;
+        padding: 5px;
+        border-radius: 5px;
+    }
+
 </style>
